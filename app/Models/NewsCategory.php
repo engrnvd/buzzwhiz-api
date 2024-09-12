@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * 
@@ -21,9 +23,22 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|NewsCategory whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewsCategory whereParentId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewsCategory whereUpdatedAt($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\NewsArticle> $articles
+ * @property-read int|null $articles_count
+ * @property-read NewsCategory|null $parentCategory
  * @mixin \Eloquent
  */
 class NewsCategory extends Model
 {
     use HasFactory;
+
+    public function articles(): BelongsToMany
+    {
+        return $this->belongsToMany(NewsArticle::class, 'news_article_categories');
+    }
+
+    public function parentCategory(): BelongsTo
+    {
+        return $this->belongsTo(NewsCategory::class, 'parent_id');
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * 
@@ -31,6 +32,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|NewsArticle whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewsArticle whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewsArticle whereUrl($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\NewsCategory> $categories
+ * @property-read int|null $categories_count
  * @mixin \Eloquent
  */
 class NewsArticle extends Model
@@ -42,5 +45,10 @@ class NewsArticle extends Model
         return [
             'published_at' => 'datetime',
         ];
+    }
+
+    public function categories(): BelongsToMany
+    {
+        return $this->belongsToMany(NewsCategory::class, 'news_article_categories');
     }
 }
