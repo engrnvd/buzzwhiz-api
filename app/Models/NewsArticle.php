@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
@@ -40,6 +41,8 @@ class NewsArticle extends Model
 {
     use HasFactory;
 
+    protected $hidden = ['pivot'];
+
     protected $fillable = [
         'title',
         'source_id',
@@ -59,6 +62,13 @@ class NewsArticle extends Model
 
     public function categories(): BelongsToMany
     {
-        return $this->belongsToMany(NewsCategory::class, 'news_article_categories');
+        return $this->belongsToMany(NewsCategory::class, 'news_article_categories')
+            ->select(['news_categories.id', 'name']);
+    }
+
+    public function source(): BelongsTo
+    {
+        return $this->belongsTo(NewsSource::class)
+            ->select(['news_sources.id', 'name', 'website']);
     }
 }

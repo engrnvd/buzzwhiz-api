@@ -32,6 +32,8 @@ class NewsCategory extends Model
 {
     use HasFactory;
 
+    protected $hidden = ['pivot'];
+
     protected $fillable = ['name', 'parent_id'];
 
     const TOP_HEADLINES = 'Top Headlines';
