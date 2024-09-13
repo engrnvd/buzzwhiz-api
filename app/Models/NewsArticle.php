@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $title
@@ -39,6 +39,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class NewsArticle extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'title',
+        'source_id',
+        'author',
+        'description',
+        'url',
+        'img_url',
+        'published_at',
+    ];
 
     protected function casts(): array
     {

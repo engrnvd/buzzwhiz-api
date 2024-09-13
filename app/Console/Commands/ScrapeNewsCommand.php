@@ -16,9 +16,8 @@ class ScrapeNewsCommand extends Command
     public function handle(): void
     {
         $categories = NewsCategory::whereNotNull('parent_id')
+            ->orWhere('name', NewsCategory::TOP_HEADLINES)
             ->get();
-
-        // todo: scrape trending news
 
         foreach ($categories as $category) {
             (new NewsApiScrapper())->scrape($category, Carbon::yesterday());

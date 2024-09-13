@@ -10,7 +10,7 @@ class NewsCategoriesSeeder extends Seeder
     public function run(): void
     {
         $categories = [
-            "Trending" => [],
+            "Top Headlines" => [],
             "Politics" => [
                 "Elections",
                 "Public Policy",

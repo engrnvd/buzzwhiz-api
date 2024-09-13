@@ -16,6 +16,7 @@ class NewsApiScrapper
     use HasLogs;
 
     protected string $url = 'https://newsapi.org/v2/everything';
+    protected string $topHeadlinesUrl = 'https://newsapi.org/v2/top-headlines';
     protected string $key = 'NEWS_API_KEY';
     protected string $logDir = 'news-api';
 
@@ -23,12 +24,17 @@ class NewsApiScrapper
     {
         $this->log('Scraping category ' . $category->name);
 
-        $response = Http::get($this->url, [
+        $url = $category->isTopHeadlines() ? $this->topHeadlinesUrl : $this->url;
+        $params = [
             'apiKey' => env($this->key),
             'language' => 'en',
-            'from' => $from->format('Y-m-d'),
-            'q' => $category->parentCategory->name . " " . $category->name,
-        ]);
+        ];
+        if (!$category->isTopHeadlines()) {
+            $params['q'] = $category->parentCategory->name . " " . $category->name;
+            $params['from'] = $from->format('Y-m-d');
+        }
+
+        $response = Http::get($url, $params);
 
         if ($response->failed()) {
             $this->log("Request failed with error {$response->status()}. Error: {$response->body()}");
@@ -60,15 +66,20 @@ class NewsApiScrapper
             $newsArticle = NewsArticle::whereUrl(Arr::get($article, 'url'))->first();
 
             if (!$newsArticle) {
-                $newsArticle = NewsArticle::create([
+                $articleData = [
                     'source_id' => $newsSource->id,
                     'title' => Arr::get($article, 'title'),
                     'description' => Arr::get($article, 'description'),
                     'author' => Arr::get($article, 'author'),
                     'url' => Arr::get($article, 'url'),
-                    'img_url' => Arr::get($article, 'img_url'),
-                    'published_at' => Arr::get($article, 'published_at'),
-                ]);
+                    'img_url' => Arr::get($article, 'urlToImage'),
+                    'published_at' => Arr::get($article, 'publishedAt'),
+                ];
+
+                // Make sure all the fields are non-empty to filter articles with bad quality
+                if (array_filter($articleData) !== $articleData) continue;
+
+                $newsArticle = NewsArticle::create($articleData);
             }
 
             // link to the category

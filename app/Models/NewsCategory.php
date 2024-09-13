@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $name
@@ -31,6 +31,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class NewsCategory extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['name', 'parent_id'];
+
+    const TOP_HEADLINES = 'Top Headlines';
+
+    public function isTopHeadlines(): bool
+    {
+        return $this->name === self::TOP_HEADLINES;
+    }
 
     public function articles(): BelongsToMany
     {

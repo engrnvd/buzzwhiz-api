@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $name
@@ -26,4 +26,6 @@ use Illuminate\Database\Eloquent\Model;
 class NewsSource extends Model
 {
     use HasFactory;
+
+    protected $fillable = ["name", "website"];
 }

@@ -11,7 +11,6 @@ return new class extends Migration {
             $table->id();
             $table->bigInteger('news_article_id')->unsigned();
             $table->bigInteger('news_category_id')->unsigned();
-            $table->timestamps();
         });
     }
 

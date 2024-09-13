@@ -9,12 +9,12 @@ return new class extends Migration {
     {
         Schema::create('news_articles', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
+            $table->text('title');
             $table->unsignedBigInteger('source_id');
             $table->string('author');
-            $table->string('description');
-            $table->string('url');
-            $table->string('img_url');
+            $table->longText('description');
+            $table->text('url');
+            $table->text('img_url');
             $table->dateTime('published_at');
             $table->timestamps();
         });
