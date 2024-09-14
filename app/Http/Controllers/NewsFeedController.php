@@ -7,6 +7,7 @@ use App\Models\NewsCategory;
 use App\Models\NewsSource;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\CursorPaginator;
+use Illuminate\Database\Eloquent\Builder;
 
 class NewsFeedController extends Controller
 {
@@ -28,6 +29,14 @@ class NewsFeedController extends Controller
 
         if (request()->has('source') && $source = NewsSource::whereSlug(request()->source)->first()) {
             $records->where('source_id', $source->id);
+        }
+
+        if (request()->has('query')) {
+            $records->where(function (Builder $q) {
+                $q->where('title', 'like', '%' . request('query') . '%')
+                    ->orWhere('description', 'like', '%' . request('query') . '%')
+                    ->orWhere('author', 'like', '%' . request('query') . '%');
+            });
         }
 
         return $records->cursorPaginate(20);
