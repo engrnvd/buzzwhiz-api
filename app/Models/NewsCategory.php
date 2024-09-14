@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  *
@@ -37,6 +38,12 @@ class NewsCategory extends Model
     protected $fillable = ['name', 'parent_id'];
 
     const TOP_HEADLINES = 'Top Headlines';
+    const BREAKING_NEWS = 'Breaking News';
+
+    public static function breaking(): self|null
+    {
+        return static::whereName(static::BREAKING_NEWS)->first();
+    }
 
     public function isTopHeadlines(): bool
     {
@@ -51,5 +58,10 @@ class NewsCategory extends Model
     public function parentCategory(): BelongsTo
     {
         return $this->belongsTo(NewsCategory::class, 'parent_id');
+    }
+
+    public function categories(): HasMany
+    {
+        return $this->hasMany(NewsCategory::class, 'parent_id');
     }
 }
