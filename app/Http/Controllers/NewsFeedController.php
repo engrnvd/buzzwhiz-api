@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\NewsArticle;
 use App\Models\NewsCategory;
 use App\Models\NewsSource;
+use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\CursorPaginator;
 
 class NewsFeedController extends Controller
@@ -17,7 +18,12 @@ class NewsFeedController extends Controller
             $records = NewsArticle::query();
         }
 
-        $records = $records->with('source', 'categories')
+        if (request()->has('date')) {
+            $date = Carbon::parse(request()->date);
+            $records->whereBetween('published_at', [$date->startOfDay(), (clone $date)->endOfDay()]);
+        }
+
+        $records->with('source', 'categories')
             ->orderByDesc('published_at');
 
         if (request()->has('source') && $source = NewsSource::whereSlug(request()->source)->first()) {
