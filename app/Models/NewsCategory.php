@@ -27,6 +27,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\NewsArticle> $articles
  * @property-read int|null $articles_count
  * @property-read NewsCategory|null $parentCategory
+ * @property string $slug
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, NewsCategory> $categories
+ * @property-read int|null $categories_count
+ * @method static \Illuminate\Database\Eloquent\Builder|NewsCategory whereSlug($value)
  * @mixin \Eloquent
  */
 class NewsCategory extends Model
@@ -63,5 +67,17 @@ class NewsCategory extends Model
     public function categories(): HasMany
     {
         return $this->hasMany(NewsCategory::class, 'parent_id');
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
+    protected static function booted(): void
+    {
+        static::saving(function (NewsCategory $model) {
+            $model->slug = \Str::slug($model->name) . "-" . $model->id;
+        });
     }
 }

@@ -57,10 +57,15 @@ class NewsApiScrapper
             $website = Arr::get($matches, 1);
             if (!$website) continue;
 
-            $newsSource = NewsSource::firstOrCreate([
-                'name' => $sourceName,
-                'website' => $website,
-            ]);
+            $newsSource = NewsSource::whereName($sourceName)->first();
+            if (!$newsSource) {
+                $newsSource = new NewsSource();
+                $newsSource->fill([
+                    'name' => $sourceName,
+                    'website' => $website,
+                ]);
+                $newsSource->save();
+            }
 
             // create / find the article
             $newsArticle = NewsArticle::whereUrl(Arr::get($article, 'url'))->first();
@@ -70,7 +75,7 @@ class NewsApiScrapper
                     'source_id' => $newsSource->id,
                     'title' => Arr::get($article, 'title'),
                     'description' => Arr::get($article, 'description'),
-                    'author' => Arr::get($article, 'author'),
+                    'author' => Str::substr(Arr::get($article, 'author'), 0, 254),
                     'url' => Arr::get($article, 'url'),
                     'img_url' => Arr::get($article, 'urlToImage'),
                     'published_at' => Arr::get($article, 'publishedAt'),

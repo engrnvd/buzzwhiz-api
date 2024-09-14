@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(NewsCategoriesSeeder::class);
+        $this->call(AddSlugToNewsTablesSeeder::class);
 
         if (!static::$numSeedersRan) {
             $this->command->info("Nothing to seed.");

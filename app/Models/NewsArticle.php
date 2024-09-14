@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property string $title
@@ -35,6 +35,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @method static \Illuminate\Database\Eloquent\Builder|NewsArticle whereUrl($value)
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\NewsCategory> $categories
  * @property-read int|null $categories_count
+ * @property-read \App\Models\NewsSource|null $source
  * @mixin \Eloquent
  */
 class NewsArticle extends Model
