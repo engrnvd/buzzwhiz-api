@@ -11,7 +11,13 @@ class NewsFeedController extends Controller
 {
     public function index(): CursorPaginator
     {
-        $records = NewsArticle::with('source', 'categories')
+        if (request()->has('category') && $category = NewsCategory::whereSlug(request()->category)->first()) {
+            $records = $category->articles();
+        } else {
+            $records = NewsArticle::query();
+        }
+
+        $records = $records->with('source', 'categories')
             ->orderByDesc('published_at');
 
         if (request()->has('source') && $source = NewsSource::whereSlug(request()->source)->first()) {

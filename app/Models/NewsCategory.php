@@ -76,8 +76,9 @@ class NewsCategory extends Model
 
     protected static function booted(): void
     {
-        static::saving(function (NewsCategory $model) {
+        static::saved(function (NewsCategory $model) {
             $model->slug = \Str::slug($model->name) . "-" . $model->id;
+            $model->save();
         });
     }
 }

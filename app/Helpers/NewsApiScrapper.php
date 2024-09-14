@@ -88,7 +88,7 @@ class NewsApiScrapper
             }
 
             // link to the category
-            $newsArticle->categories()->attach($category->id);
+            $newsArticle->categories()->syncWithoutDetaching([$category->id]);
         }
     }
 }

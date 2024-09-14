@@ -44,8 +44,9 @@ class NewsSource extends Model
 
     protected static function booted(): void
     {
-        static::saving(function (NewsSource $source) {
+        static::saved(function (NewsSource $source) {
             $source->slug = \Str::slug($source->name) . "-" . $source->id;
+            $source->save();
         });
     }
 }
