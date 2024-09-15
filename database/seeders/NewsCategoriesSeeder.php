@@ -118,11 +118,11 @@ class NewsCategoriesSeeder extends Seeder
 
         foreach ($categories as $category => $subCategories) {
             $categoryModel = new NewsCategory(['name' => $category, 'parent_id' => null]);
-            $categoryModel->saveQuietly();
+            $categoryModel->save();
 
             foreach ($subCategories as $subCategory) {
                 $subCategoryModel = new NewsCategory(['name' => $subCategory, 'parent_id' => $categoryModel->id]);
-                $subCategoryModel->saveQuietly();
+                $subCategoryModel->save();
             }
         }
     }

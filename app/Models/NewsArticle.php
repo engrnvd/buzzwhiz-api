@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $title
@@ -36,6 +36,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\NewsCategory> $categories
  * @property-read int|null $categories_count
  * @property-read \App\Models\NewsSource|null $source
+ * @property int|null $author_id
+ * @method static \Illuminate\Database\Eloquent\Builder|NewsArticle whereAuthorId($value)
  * @mixin \Eloquent
  */
 class NewsArticle extends Model
@@ -71,5 +73,17 @@ class NewsArticle extends Model
     {
         return $this->belongsTo(NewsSource::class)
             ->select(['news_sources.id', 'name', 'website']);
+    }
+
+    public function saveAuthor($authorName): void
+    {
+        $author = Author::whereName($authorName)->first();
+        if (!$author) {
+            $author = new Author();
+            $author->name = $authorName;
+            $author->save();
+        }
+        $this->author_id = $author->id;
+        $this->save();
     }
 }

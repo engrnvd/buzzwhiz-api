@@ -85,6 +85,8 @@ class NewsApiScrapper
                 if (array_filter($articleData) !== $articleData) continue;
 
                 $newsArticle = NewsArticle::create($articleData);
+                /* @var $newsArticle NewsArticle */
+                $newsArticle->saveAuthor(Str::substr(Arr::get($article, 'author'), 0, 254));
             }
 
             // link to the category

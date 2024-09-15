@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -33,7 +32,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|NewsCategory whereSlug($value)
  * @mixin \Eloquent
  */
-class NewsCategory extends Model
+class NewsCategory extends ModelWithSlug
 {
     use HasFactory;
 
@@ -67,18 +66,5 @@ class NewsCategory extends Model
     public function categories(): HasMany
     {
         return $this->hasMany(NewsCategory::class, 'parent_id');
-    }
-
-    public function getRouteKeyName(): string
-    {
-        return 'slug';
-    }
-
-    protected static function booted(): void
-    {
-        static::saved(function (NewsCategory $model) {
-            $model->slug = \Str::slug($model->name) . "-" . $model->id;
-            $model->save();
-        });
     }
 }

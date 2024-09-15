@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
@@ -24,9 +23,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|NewsSource whereWebsite($value)
  * @property string $slug
  * @method static \Illuminate\Database\Eloquent\Builder|NewsSource whereSlug($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\NewsArticle> $articles
+ * @property-read int|null $articles_count
  * @mixin \Eloquent
  */
-class NewsSource extends Model
+class NewsSource extends ModelWithSlug
 {
     use HasFactory;
 
@@ -35,18 +36,5 @@ class NewsSource extends Model
     public function articles(): HasMany
     {
         return $this->hasMany(NewsArticle::class, 'source_id');
-    }
-
-    public function getRouteKeyName(): string
-    {
-        return 'slug';
-    }
-
-    protected static function booted(): void
-    {
-        static::saved(function (NewsSource $source) {
-            $source->slug = \Str::slug($source->name) . "-" . $source->id;
-            $source->save();
-        });
     }
 }
