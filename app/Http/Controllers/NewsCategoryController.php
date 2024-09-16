@@ -31,7 +31,31 @@ class NewsCategoryController extends Controller
 
     public function toggleFavorite($id)
     {
-        auth()->user()->categories()->toggle([$id]);
-        return '';
+        $user = auth()->user();
+        $category = NewsCategory::findOrFail($id);
+        /* @var $category NewsCategory */
+
+        $query = $user->categories();
+        $query->toggle([$id]);
+
+        if (!$category->parent_id) {
+            $checked = \DB::table('users_news_categories')
+                ->where('user_id', $user->id)
+                ->where('news_category_id', $id)
+                ->exists();
+            $childIds = $category->categories()->pluck('id')->toArray();
+            $checked ? $query->syncWithoutDetaching($childIds) : $query->detach($childIds);
+        } else {
+            $parentCategory = $category->parentCategory;
+            $childrenIds = $parentCategory->categories()->pluck('id');
+            $checkedCount = \DB::table('users_news_categories')
+                ->where('user_id', $user->id)
+                ->whereIn('news_category_id', $childrenIds)
+                ->count();
+            if ($checkedCount === $childrenIds->count()) $query->syncWithoutDetaching([$parentCategory->id]);
+            else $query->detach([$parentCategory->id]);
+        }
+
+        return 'ok';
     }
 }
