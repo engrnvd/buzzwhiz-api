@@ -13,7 +13,6 @@ class NewsCategoryController extends Controller
             ->get();
     }
 
-
     public function userCategories()
     {
         $user = auth()->user();
