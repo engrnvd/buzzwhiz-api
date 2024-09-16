@@ -2,95 +2,64 @@
 
 namespace App\Helpers;
 
-use App\Models\NewsArticle;
 use App\Models\NewsCategory;
-use App\Models\NewsSource;
 use App\Traits\HasLogs;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
-class NewsApiScrapper
+class NewsApiScrapper extends BaseNewsScrapper
 {
     use HasLogs;
 
     protected string $url = 'https://newsapi.org/v2/everything';
     protected string $topHeadlinesUrl = 'https://newsapi.org/v2/top-headlines';
-    protected string $key = 'NEWS_API_KEY';
+    protected string $apiKeyInEnv = 'NEWS_API_KEY';
     protected string $logDir = 'news-api';
 
-    public function scrape(NewsCategory $category, Carbon $from): void
+    protected function essentialParams(): array
     {
-        $this->log('Scraping category ' . $category->name);
-
-        $url = $category->isTopHeadlines() ? $this->topHeadlinesUrl : $this->url;
-        $params = [
-            'apiKey' => env($this->key),
+        return [
+            'apiKey' => env($this->apiKeyInEnv),
             'language' => 'en',
         ];
-        if (!$category->isTopHeadlines()) {
-            $params['q'] = $category->parentCategory->name . " " . $category->name;
-            $params['from'] = $from->format('Y-m-d');
-        }
+    }
 
-        $response = Http::get($url, $params);
+    protected function paramsForSearch(NewsCategory $category, Carbon $startDate): array
+    {
+        return [
+            'q' => $category->parentCategory->name . " " . $category->name,
+            'from' => $startDate->format('Y-m-d')
+        ];
+    }
 
-        if ($response->failed()) {
-            $this->log("Request failed with error {$response->status()}. Error: {$response->body()}");
-            return;
-        }
+    protected function getArticlesFromResponse($json): array
+    {
+        return Arr::get($json, 'articles', []);
+    }
 
-        $json = $response->json();
+    protected function getSourceNameFromArticle($article): string
+    {
+        return Arr::get($article, 'source.name');
+    }
 
-        $this->log($json);
+    protected function getWebUrlFromArticle($article): string
+    {
+        return Arr::get($article, 'url');
+    }
 
-        $this->log("Articles found: " . Arr::get($json, 'totalResults'));
+    protected function getAuthorFromArticle($article): string
+    {
+        return Str::substr(Arr::get($article, 'author'), 0, 254);
+    }
 
-        foreach (Arr::get($json, 'articles', []) as $article) {
-            // create / find the source if needed
-            $sourceName = Arr::get($article, 'source.name');
-            if (!$sourceName || Str::contains($sourceName, 'Removed')) continue;
-
-            if (!preg_match('/^(https:\/\/.+?)\//', Arr::get($article, 'url'), $matches)) continue;
-
-            $website = Arr::get($matches, 1);
-            if (!$website) continue;
-
-            $newsSource = NewsSource::whereName($sourceName)->first();
-            if (!$newsSource) {
-                $newsSource = new NewsSource();
-                $newsSource->fill([
-                    'name' => $sourceName,
-                    'website' => $website,
-                ]);
-                $newsSource->save();
-            }
-
-            // create / find the article
-            $newsArticle = NewsArticle::whereUrl(Arr::get($article, 'url'))->first();
-
-            if (!$newsArticle) {
-                $articleData = [
-                    'source_id' => $newsSource->id,
-                    'title' => Arr::get($article, 'title'),
-                    'description' => Arr::get($article, 'description'),
-                    'author' => Str::substr(Arr::get($article, 'author'), 0, 254),
-                    'url' => Arr::get($article, 'url'),
-                    'img_url' => Arr::get($article, 'urlToImage'),
-                    'published_at' => Arr::get($article, 'publishedAt'),
-                ];
-
-                // Make sure all the fields are non-empty to filter articles with bad quality
-                if (array_filter($articleData) !== $articleData) continue;
-
-                $newsArticle = NewsArticle::create($articleData);
-                /* @var $newsArticle NewsArticle */
-                $newsArticle->saveAuthor(Str::substr(Arr::get($article, 'author'), 0, 254));
-            }
-
-            // link to the category
-            $newsArticle->categories()->syncWithoutDetaching([$category->id]);
-        }
+    protected function getDataDataForArticle($article): array
+    {
+        return [
+            'title' => Arr::get($article, 'title'),
+            'description' => Arr::get($article, 'description'),
+            'img_url' => Arr::get($article, 'urlToImage'),
+            'published_at' => Arr::get($article, 'publishedAt'),
+        ];
     }
 }
