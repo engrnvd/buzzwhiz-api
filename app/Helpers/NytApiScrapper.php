@@ -61,7 +61,7 @@ class NytApiScrapper extends BaseNewsScrapper
         return [
             'title' => Arr::get($article, 'abstract'),
             'description' => Arr::get($article, 'lead_paragraph'),
-            'img_url' => Arr::get($item, 'url'),
+            'img_url' => "https://www.nytimes.com/" . Arr::get($item, 'url'),
             'published_at' => Arr::get($article, 'pub_date'),
         ];
     }
