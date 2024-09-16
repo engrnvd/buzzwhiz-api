@@ -36,6 +36,11 @@ class BaseNewsScrapper
 
     }
 
+    protected function paramsForTopHeadlines(NewsCategory $category, Carbon $startDate): array
+    {
+        return [];
+    }
+
     protected function getArticlesFromResponse($json): array
     {
         return Arr::get($json, 'articles', []);
@@ -73,6 +78,8 @@ class BaseNewsScrapper
 
         if (!$category->isTopHeadlines()) {
             $params = [...$params, ...$this->paramsForSearch($category, $from)];
+        } else {
+            $params = [...$params, ...$this->paramsForTopHeadlines($category, $from)];
         }
 
         $this->log("Scraping category {$category->name}\nurl: {$url}\nparams: " . json_encode($params));
