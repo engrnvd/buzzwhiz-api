@@ -12,6 +12,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     Route::get('/user-sources', [NewsSourceController::class, 'userSources']);
+    Route::post('/user-sources/toggle/{id}', [NewsSourceController::class, 'toggleFavorite']);
 });
 
 Route::get('/news-feed', [NewsFeedController::class, 'index']);

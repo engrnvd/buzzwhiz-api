@@ -22,4 +22,10 @@ class NewsSourceController extends Controller
 
         return ['favorites' => $favorites, 'sources' => $sources];
     }
+
+    public function toggleFavorite($id)
+    {
+        auth()->user()->sources()->toggle([$id]);
+        return '';
+    }
 }
