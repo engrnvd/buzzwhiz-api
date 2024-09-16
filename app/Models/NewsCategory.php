@@ -36,7 +36,7 @@ class NewsCategory extends ModelWithSlug
 {
     use HasFactory;
 
-    protected $hidden = ['pivot'];
+    protected $hidden = ['pivot', 'created_at', 'updated_at'];
 
     protected $fillable = ['name', 'parent_id'];
 

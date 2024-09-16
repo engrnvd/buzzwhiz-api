@@ -20,7 +20,7 @@ class NewsSourceController extends Controller
 
         $sources = NewsSource::select(['id', 'name', 'website', 'slug'])->get();
 
-        return ['favorites' => $favorites, 'sources' => $sources];
+        return ['favorites' => $favorites, 'items' => $sources];
     }
 
     public function toggleFavorite($id)
