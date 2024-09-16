@@ -67,7 +67,7 @@ class TheGuardianApiScrapper extends BaseNewsScrapper
     {
         return [
             'title' => Arr::get($article, 'fields.headline'),
-            'description' => Str::substr(Arr::get($article, 'fields.body'), 0, 200),
+            'description' => Str::substr(strip_tags(Arr::get($article, 'fields.body')), 0, 200),
             'img_url' => Arr::get($article, 'fields.thumbnail'),
             'published_at' => Arr::get($article, 'webPublicationDate'),
         ];
